@@ -47,6 +47,25 @@ export const demote_inactive_streams_values = {
     },
 };
 
+export const week_starts_on_values = {
+    automatic: {
+        code: 1,
+        description: $t({defaultMessage: "Automatic"}),
+    },
+    saturday: {
+        code: 2,
+        description: $t({defaultMessage: "Saturday"}),
+    },
+    sunday: {
+        code: 3,
+        description: $t({defaultMessage: "Sunday"}),
+    },
+    monday: {
+        code: 4,
+        description: $t({defaultMessage: "Monday"}),
+    },
+};
+
 export const web_mark_read_on_scroll_policy_values = {
     always: {
         code: 1,
@@ -659,6 +678,7 @@ export const preferences_settings_labels = {
     web_navigate_to_sent_message: $t({
         defaultMessage: "Automatically go to conversation where you sent a message",
     }),
+    week_starts_on: $t({defaultMessage: "Week starts on"}),
 };
 
 export const notification_settings_labels = {
