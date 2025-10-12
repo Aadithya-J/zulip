@@ -14063,6 +14063,8 @@ paths:
                     - 2
                     - 3
                   example: 1
+                week_starts_on:
+                  $ref: "#/components/schemas/WeekStartsOn"
                 enable_drafts_synchronization:
                   description: |
                     A boolean parameter to control whether synchronizing drafts is enabled for
@@ -17769,6 +17771,8 @@ paths:
 
                               Automatic detection is implementing using the standard `prefers-color-scheme`
                               media query.
+                          week_starts_on:
+                            $ref: "#/components/schemas/WeekStartsOn"
                           translate_emoticons:
                             type: boolean
                             description: |
@@ -20689,6 +20693,8 @@ paths:
 
                               Automatic detection is implementing using the standard `prefers-color-scheme`
                               media query.
+                          week_starts_on:
+                            $ref: "#/components/schemas/WeekStartsOn"
                           translate_emoticons:
                             type: boolean
                             description: |
@@ -21786,6 +21792,8 @@ paths:
                     the `PATCH /settings/display` endpoint.
                   type: boolean
                   example: true
+                week_starts_on:
+                  $ref: "#/components/schemas/WeekStartsOn"
                 web_mark_read_on_scroll_policy:
                   description: |
                     Whether or not to mark messages as read when the user scrolls through their
@@ -25615,6 +25623,23 @@ components:
         filtering by event type in [POST /register](/api/register-queue).
     Anchor:
       type: string
+    WeekStartsOn:
+      type: integer
+      description: |
+        First day of the week used by date pickers in the web/desktop application.
+
+        - 1 - Automatic (follows system settings)
+        - 2 - Saturday
+        - 3 - Sunday
+        - 4 - Monday
+
+        **Changes**: New in Zulip 12.0 (feature level ZF-9b7b77).
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      example: 1
     Attachment:
       type: object
       description: |

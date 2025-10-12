@@ -372,6 +372,7 @@ class ChangeSettingsTest(ZulipTestCase):
             realm_name_in_email_notifications_policy=2,
             automatically_follow_topics_policy=1,
             automatically_unmute_topics_in_muted_streams_policy=1,
+            week_starts_on=2,
             resolved_topic_notice_auto_read_policy=ResolvedTopicNoticeAutoReadPolicyEnum.always.name,
         )
 
@@ -465,6 +466,11 @@ class ChangeSettingsTest(ZulipTestCase):
                 "setting_name": "color_scheme",
                 "value": 10,
                 "error_msg": "Invalid color_scheme: Value error, Not in the list of possible values",
+            },
+            {
+                "setting_name": "week_starts_on",
+                "value": 9,
+                "error_msg": "Invalid week_starts_on: Value error, Not in the list of possible values",
             },
             {
                 "setting_name": "notification_sound",

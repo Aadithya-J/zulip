@@ -718,6 +718,8 @@ def update_realm_user_settings_defaults(
     starred_message_counts: Json[bool] | None = None,
     translate_emoticons: Json[bool] | None = None,
     twenty_four_hour_time: Json[bool] | None = None,
+    week_starts_on: Json[Annotated[int, check_int_in_validator(UserProfile.WEEK_STARTS_ON_CHOICES)]]
+    | None = None,
     user_list_style: Json[
         Annotated[int, check_int_in_validator(UserProfile.USER_LIST_STYLE_CHOICES)]
     ]
