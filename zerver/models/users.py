@@ -76,6 +76,18 @@ class UserBaseSettings(models.Model):
     translate_emoticons = models.BooleanField(default=False)
     display_emoji_reaction_users = models.BooleanField(default=True)
     twenty_four_hour_time = models.BooleanField(default=False)
+    # First day of the week preference (used by web date pickers)
+    WEEK_STARTS_ON_AUTOMATIC = 1
+    WEEK_STARTS_ON_SATURDAY = 2
+    WEEK_STARTS_ON_SUNDAY = 3
+    WEEK_STARTS_ON_MONDAY = 4
+    WEEK_STARTS_ON_CHOICES = [
+        WEEK_STARTS_ON_AUTOMATIC,
+        WEEK_STARTS_ON_SATURDAY,
+        WEEK_STARTS_ON_SUNDAY,
+        WEEK_STARTS_ON_MONDAY,
+    ]
+    week_starts_on = models.PositiveSmallIntegerField(default=WEEK_STARTS_ON_AUTOMATIC)
     starred_message_counts = models.BooleanField(default=True)
     web_suggest_update_timezone = models.BooleanField(default=True)
     COLOR_SCHEME_AUTOMATIC = 1
@@ -392,6 +404,7 @@ class UserBaseSettings(models.Model):
         resolved_topic_notice_auto_read_policy=ResolvedTopicNoticeAutoReadPolicyEnum,
         web_left_sidebar_unreads_count_summary=bool,
         web_left_sidebar_show_channel_folders=bool,
+        week_starts_on= int,
     )
 
     modern_notification_settings = dict(
