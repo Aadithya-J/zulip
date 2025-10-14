@@ -143,6 +143,7 @@ export function set_up(settings_panel: SettingsPanel): void {
     $container
         .find(".setting_twenty_four_hour_time")
         .val(JSON.stringify(settings_object.twenty_four_hour_time));
+    $container.find(".setting_week_starts_on").val(settings_object.week_starts_on.toString());
     $container
         .find(".setting_web_mark_read_on_scroll_policy")
         .val(settings_object.web_mark_read_on_scroll_policy);

@@ -947,6 +947,7 @@ export function dispatch_normal_event(event) {
                 "web_left_sidebar_unreads_count_summary",
                 "web_left_sidebar_show_channel_folders",
                 "web_inbox_show_channel_folders",
+                "week_starts_on",
             ];
 
             const original_home_view = user_settings.web_home_view;
