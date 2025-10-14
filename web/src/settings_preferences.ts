@@ -10,6 +10,7 @@ import * as channel from "./channel.ts";
 import * as dialog_widget from "./dialog_widget.ts";
 import * as dropdown_widget from "./dropdown_widget.ts";
 import * as emojisets from "./emojisets.ts";
+import {get_first_day_of_week} from "./flatpickr.ts";
 import {$t_html, get_language_list_columns} from "./i18n.ts";
 import * as information_density from "./information_density.ts";
 import * as loading from "./loading.ts";
@@ -353,6 +354,27 @@ export function update_page(property: UserSettingsProperty): void {
     }
     const $container = $(user_settings_panel.container);
     let value = user_settings[property];
+
+    // Refresh flatpickr instance to match the updated first day of week.
+    if (property === "week_starts_on") {
+        $(".custom_user_field .datepicker").each((_i, el) => {
+            const fpElement =
+                // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+                el as HTMLElement & {
+                    _flatpickr?: {
+                        set: (key: string, value: unknown) => void;
+                        redraw: () => void;
+                    };
+                };
+
+            const fp = fpElement._flatpickr;
+
+            if (fp) {
+                fp.set("locale", {firstDayOfWeek: get_first_day_of_week()});
+                fp.redraw();
+            }
+        });
+    }
 
     // settings_org.set_input_element_value doesn't support radio
     // button widgets like these.

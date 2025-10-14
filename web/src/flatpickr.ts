@@ -3,6 +3,8 @@ import flatpickr from "flatpickr";
 import confirmDatePlugin from "flatpickr/dist/plugins/confirmDate/confirmDate";
 import $ from "jquery";
 import assert from "minimalistic-assert";
+import * as z from "zod/mini";
+import {getWeekStartByLocale} from "weekstart";
 
 import {$t} from "./i18n.ts";
 import {user_settings} from "./user_settings.ts";
@@ -18,6 +20,102 @@ function is_numeric_key(key: string): boolean {
     return ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(key);
 }
 
+type Weekday0to6 = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+type LocaleWithWeekInfo = Intl.Locale & {
+    getWeekInfo: () => {firstDay: unknown};
+};
+
+const firstDaySchema = z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+    z.literal(5),
+    z.literal(6),
+    z.literal(7),
+]);
+
+const weekdaySchema = z.union([
+    z.literal(0),
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+    z.literal(5),
+    z.literal(6),
+]);
+
+const weekInfoSchema = z.object({
+    firstDay: firstDaySchema,
+});
+
+function parseWeekday(value: number): Weekday0to6 | undefined {
+    const result = weekdaySchema.safeParse(value);
+    if (result.success) {
+        return result.data;
+    }
+    return undefined;
+}
+
+function hasGetWeekInfo(loc: Intl.Locale): loc is LocaleWithWeekInfo {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return typeof (loc as {getWeekInfo?: unknown}).getWeekInfo === "function";
+}
+
+function getNavigatorLocale(): string | undefined {
+    if (typeof navigator === "undefined") {
+        return undefined;
+    }
+    // navigator.language returns the browser's UI language, e.g. "en-US".
+    return navigator.languages?.[0] ?? navigator.language;
+}
+
+export function get_first_day_of_week(): Weekday0to6 {
+    switch (user_settings.week_starts_on) {
+        case 2:
+            return 6; // Saturday
+        case 3:
+            return 0; // Sunday
+        case 4:
+            return 1; // Monday
+    }
+    const navigatorLocale = getNavigatorLocale();
+
+    if (navigatorLocale !== undefined) {
+        // Intl.Locale.getWeekInfo().firstDay – returns 1..7 (Mon..Sun) (Chrome and Safari)
+        try {
+            const loc = new Intl.Locale(navigatorLocale);
+            if (hasGetWeekInfo(loc)) {
+                const weekInfo = weekInfoSchema.safeParse(loc.getWeekInfo());
+                if (weekInfo.success) {
+                    const normalized = weekInfo.data.firstDay % 7;
+                    const weekday = parseWeekday(normalized);
+                    if (weekday !== undefined) {
+                        return weekday;
+                    }
+                }
+            }
+        } catch {
+            /* ignore */
+        }
+
+        // CLDR-backed fallback (Firefox)
+        try {
+            const w = getWeekStartByLocale(navigatorLocale) % 7;
+            const weekday = parseWeekday(w);
+            if (weekday !== undefined) {
+                return weekday;
+            }
+        } catch {
+            /* ignore */
+        }
+    }
+
+    // Final fallback: Sunday
+    return 0;
+}
+
 export function show_flatpickr(
     element: HTMLElement,
     callback: (time: string) => void,
@@ -25,6 +123,17 @@ export function show_flatpickr(
     options: flatpickr.Options.Options = {},
 ): flatpickr.Instance {
     const $flatpickr_input = $<HTMLInputElement>("<input>").attr("id", "#timestamp_flatpickr");
+
+    const baseLocale: Record<string, unknown> =
+        typeof options.locale === "object" && options.locale !== null ? options.locale : {};
+    const mergedLocale = {
+        ...baseLocale,
+        firstDayOfWeek: get_first_day_of_week(),
+    };
+    const mergedOptions: flatpickr.Options.Options = {
+        ...options,
+        locale: mergedLocale,
+    };
 
     flatpickr_instance = flatpickr(util.the($flatpickr_input), {
         mode: "single",
@@ -82,7 +191,7 @@ export function show_flatpickr(
                 event.stopPropagation();
             }
         },
-        ...options,
+        ...mergedOptions,
     });
 
     const $container = $(flatpickr_instance.calendarContainer);
