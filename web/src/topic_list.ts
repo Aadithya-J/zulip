@@ -17,6 +17,7 @@ import * as scroll_util from "./scroll_util.ts";
 import * as stream_data from "./stream_data.ts";
 import * as stream_topic_history from "./stream_topic_history.ts";
 import * as stream_topic_history_util from "./stream_topic_history_util.ts";
+import * as left_sidebar_filter from "./left_sidebar_filter.ts";
 import type {StreamSubscription} from "./sub_store.ts";
 import * as sub_store from "./sub_store.ts";
 import * as topic_filter_pill from "./topic_filter_pill.ts";
@@ -520,6 +521,9 @@ export function get_left_sidebar_topic_search_term(): string {
 }
 
 export function get_typeahead_search_pills_syntax(): string {
+    if (!zoomed) {
+        return left_sidebar_filter.get_topics_state();
+    }
     const pills = topic_filter_pill_widget?.items() ?? [];
 
     if (pills.length === 0) {
